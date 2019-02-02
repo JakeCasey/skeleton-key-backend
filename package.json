@@ -25,9 +25,7 @@
     "stripe": "^6.12.1"
   },
   "license": "MIT",
-  "repository": {
-    "url": "wesbos.com"
-  },
+  "repository": {},
   "babel": {
     "presets": [
       "env"
