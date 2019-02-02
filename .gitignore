@@ -20,7 +20,7 @@ nbproject
 Thumbs.db
 
 
-*.yml
+# *.yml
 # datamodel.prisma
 
 # NPM packages folder.
