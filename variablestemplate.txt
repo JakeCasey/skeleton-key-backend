@@ -1,0 +1,11 @@
+#this should be renamed 'variables.env' and filled with appropriate data
+FRONTEND_URL="http://localhost:7777"
+PRISMA_ENDPOINT="yourprismaendpoint"
+PRISMA_SECRET="thisissecret"
+APP_SECRET="jwtsecret123"
+PORT=4444
+#mailtrap data
+MAIL_HOST="smtp.mailtrap.io"
+MAIL_PORT=2525
+MAIL_USER="aaaaaaaaaaaaaa"
+MAIL_PASS="bbbbbbbbbbbbbb"
