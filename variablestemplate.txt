@@ -1,4 +1,6 @@
 #this should be renamed 'variables.env' and filled with appropriate data
+#config vars should NOT be pushed to production. Fill out config in dokku during production deploy.
+
 FRONTEND_URL="thisisoururlafterwedeploytoourremoteserver"
 DEV_FRONTEND_URL="http://localhost:7777"
 PRISMA_ENDPOINT="yourprismaendpoint"
