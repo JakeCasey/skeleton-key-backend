@@ -38,14 +38,16 @@ server.express.use(async (req, res, next) => {
   next();
 });
 
+var origin =
+  environment == 'development'
+    ? process.env.DEV_FRONTEND_URL
+    : process.env.FRONTEND_URL;
+
 server.start(
   {
     cors: {
       credentials: true,
-      origin:
-        environment == 'development'
-          ? process.env.DEV_FRONTEND_URL
-          : process.env.FRONTEND_URL,
+      origin: origin,
     },
   },
   deets => {
