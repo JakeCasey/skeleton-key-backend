@@ -1,6 +1,8 @@
 #this should be renamed 'variables.env' and filled with appropriate data
-FRONTEND_URL="http://localhost:7777"
+FRONTEND_URL="thisisoururlafterwedeploytoourremoteserver"
+DEV_FRONTEND_URL="http://localhost:7777"
 PRISMA_ENDPOINT="yourprismaendpoint"
+DEV_PRISMA_ENDPOINT="thisisyourdevelopmentprismaendpoint"
 PRISMA_SECRET="thisissecret"
 APP_SECRET="jwtsecret123"
 PORT=4444

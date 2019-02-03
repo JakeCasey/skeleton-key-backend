@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: 'variables.env' });
 const createServer = require('./createServer');
 const db = require('./db');
+const environment = process.env.NODE_ENV || 'development';
 
 const server = createServer();
 
@@ -37,13 +38,14 @@ server.express.use(async (req, res, next) => {
   next();
 });
 
-//TODO Use Express middleware to populate current user
-// start it
 server.start(
   {
     cors: {
       credentials: true,
-      origin: process.env.FRONTEND_URL,
+      origin:
+        environment == 'development'
+          ? process.env.DEV_FRONTEND_URL
+          : process.env.FRONTEND_URL,
     },
   },
   deets => {
