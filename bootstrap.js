@@ -209,13 +209,3 @@ deploy = () => {
 };
 
 program.parse(process.argv);
-
-//npm install
-
-//run prisma init
-
-//get prisma endpoint and write variables.env/prisma.yml/datamodel.prisma
-
-//make sure our other pieces are here (check if frontend and prisma are in place) if not clone them and run their boostrappers.
-
-//npm run deploy (insert dummy data?);
