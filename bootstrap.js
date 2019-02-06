@@ -26,32 +26,38 @@ const title = () => {
   });
 };
 
-program
-  .option('-f, --full', 'Full setup, bootstraps frontend as well.')
-  .action((dir, cmd) => {
-    title();
+program.option('-f, --full', 'Full setup.').action((dir, cmd) => {
+  title();
 
-    setTimeout(() => {
-      inquirer
-        .prompt([
-          {
-            type: 'confirm',
-            name: 'full',
-            message:
-              'This bootstrapper does a lot of stuff without your permission including downloading/deleting files and shit. You cool with this?',
-          },
-        ])
-        .then(({ full }) => {
+  setTimeout(() => {
+    inquirer
+      .prompt([
+        {
+          type: 'confirm',
+          name: 'full',
+          message:
+            'This bootstrapper does a lot of stuff without your permission including downloading/deleting files and shit. You cool with this?',
+        },
+      ])
+      .then(({ full }) => {
+        if (full) {
           write('Running npm i...');
-          bootstrapWithPrisma();
-          if (full) {
-            // bootstrapWithPrisma();
-          } else {
-            // ui.log.write('Exiting. No changes have been made.');
-          }
-        });
-    }, 500);
-  });
+          const npm = spawn('npm', ['i'], { stdio: 'inherit' });
+          npm.on('exit', code => {
+            write(`Prisma init is exiting with code ${code}`);
+            if (code !== 0) {
+              write('Something went wrong with your npm i. Exiting.');
+              process.exit(1);
+            } else {
+              bootstrapWithPrisma();
+            }
+          });
+        } else {
+          // ui.log.write('Exiting. No changes have been made.');
+        }
+      });
+  }, 500);
+});
 
 bootstrapWithPrisma = async () => {
   if (exists('datamodel.prisma')) {
