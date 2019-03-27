@@ -15,6 +15,9 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
+  subscribe(userId: ID!, token: Token! ): User
+  unsubscribe(userId: ID!, subscriptionId: String! ): User
+
 }
 
 type Query {
@@ -28,4 +31,10 @@ type User {
   name: String!
   email: String!
   permissions: [Permission!]!
+}
+
+#This needs to have all the fields of the stripe TOKEN
+type Token {
+  id: ID!
+  test: String!
 }
