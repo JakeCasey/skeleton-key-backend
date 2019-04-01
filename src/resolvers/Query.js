@@ -25,6 +25,28 @@ const Query = {
     //2. If they do, query all the users.
     return ctx.db.query.users({}, info);
   },
+  async getPlansList(parent, args, ctx, info) {
+    //mock subscriptions as strings
+    let subscriptions = ['1111111', '222222222', '333333333'];
+    //mock subscriptions as subscriptions
+
+    //mocked users
+    let user = {
+      id: 'userid'
+    }
+    //array of plans
+    subscriptions = [{
+      id: '1111',
+      planId: 'this is a subscription name',
+      interval: 'month',
+      product: 'product-id',
+      usersSubscribed: [user]
+    }]
+    //get plans from DB or build cron that draws plans from stripe occasionally and caches in DB?
+
+
+    return subscriptions;
+  }
   // async items(parent, args, ctx, info) {
   //   const items = await ctx.db.query.items();
   //   return items;

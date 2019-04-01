@@ -15,15 +15,15 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
-  subscribe(userId: ID!, token: Token! ): User
-  unsubscribe(userId: ID!, subscriptionId: String! ): User
-
+  subscribe( token: TokenInput! ): User
+  unsubscribe( subscriptionId: String! ): User
 }
 
 type Query {
   usersConnection(where: UserWhereInput): UserConnection
   me: User
   users: [User]!
+  getPlansList: [ Plan ]!
 }
 
 type User {
@@ -33,8 +33,9 @@ type User {
   permissions: [Permission!]!
 }
 
-#This needs to have all the fields of the stripe TOKEN
-type Token {
-  id: ID!
-  test: String!
+#Stripe Token
+input TokenInput {
+  tokenId: String!
+  cardId: String!
 }
+

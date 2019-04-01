@@ -20,3 +20,12 @@ type User {
   resetTokenExpiry: Float
   permissions: [Permission]
 }
+
+type Plan {
+  id: ID! @unique,
+  planId: String!,
+  interval: String,
+  product: String!,
+  usersSubscribed: [User]!
+}
+
