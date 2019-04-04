@@ -13,19 +13,23 @@ enum Permission {
 
 type User {
   id: ID! @unique
+  stripeCustomerId: String
+  stripeSubscriptionId: String
   name: String!
   email: String! @unique
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission]
+  plansSubscribed: [Plan]
 }
 
 type Plan {
   id: ID! @unique,
   planId: String!,
   interval: String,
+  description: String,
   product: String!,
-  usersSubscribed: [User]!
+  usersSubscribed: [User]
 }
 

@@ -2,7 +2,6 @@ let bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
 const { promisify } = require('util');
-
 const oneYear = 1000 * 60 * 60 * 24 * 365; // 1 year
 const { transport, makeANiceEmail } = require('../mail');
 const { hasPermission } = require('../utils');
@@ -94,12 +93,6 @@ const Mutations = {
     //4. return the message
     return { message: 'Thanks!' };
   },
-  async subscribe(parent, args, ctx, info) {
-
-  },
-  async unsubscribe(parent, args, ctx, info) {
-
-  },
   async resetPassword(parent, args, ctx, info) {
     //1. check if passwords match
     if (args.password !== args.confirmPassword) {
@@ -170,6 +163,21 @@ const Mutations = {
       },
       info,
     );
+  },
+  async subscribe(parent, args, ctx, info) {
+    //1. Create Customer
+    const { tokenId, planId } = args;
+    console.log(tokenId, planId);
+
+    //2. Update user with stripeCustomerId
+    //3. Subscribe Customer to Plan
+    //4. If Plan does not exist, create plan in local DB
+    //5. Add User to Plan
+  },
+  async unsubscribe(parent, args, ctx, info) {
+    //1. 
+
+
   },
 };
 
