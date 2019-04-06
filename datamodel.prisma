@@ -13,8 +13,8 @@ enum Permission {
 
 type User {
   id: ID! @unique
-  stripeCustomerId: String
-  stripeSubscriptionId: String
+  customerId: String
+  subscriptionId: String
   name: String!
   email: String! @unique
   password: String!

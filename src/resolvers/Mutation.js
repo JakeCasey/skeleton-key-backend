@@ -7,6 +7,14 @@ const { transport, makeANiceEmail } = require('../mail');
 const { hasPermission } = require('../utils');
 const stripe = require('../stripe');
 
+
+var subscription = { create: stripe.subscriptions.create.bind(stripe.subscriptions) };
+var customer = { create: stripe.customers.create.bind(stripe.customers) };
+
+const stripeSubscriptionsCreate = promisify(subscription.create);
+const stripeSubscriptionsUpdate = promisify(subscription.update);
+const stripeCustomersCreate = promisify(customer.create);
+
 const Mutations = {
   async signup(parent, args, ctx, info) {
     //lowercase email
@@ -164,18 +172,79 @@ const Mutations = {
       info,
     );
   },
-  async subscribe(parent, args, ctx, info) {
-    //1. Create Customer
-    const { tokenId, planId } = args;
-    console.log(tokenId, planId);
+  async subscribe(parent, { tokenId, planId }, ctx, info) {
 
-    //2. Update user with stripeCustomerId
-    //3. Subscribe Customer to Plan
-    //4. If Plan does not exist, create plan in local DB
-    //5. Add User to Plan
+    //1. Find or Create Customer
+    //1a. Check if there is already a customer ID in the User model
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId,
+        },
+      },
+    );
+    //1b. if a customerId exists, subscribe it to our planId
+    if (currentUser.customerId) {
+      var subscription = await stripeSubscriptionsCreate({ customer: currentUser.customerId, plan: planId });
+    }
+    else {
+      //1c. else create a customer
+      var customer = await stripeCustomersCreate({ email: currentUser.email, source: tokenId });
+
+      //2. Subscribe Customer to planId with customerId
+      var subscription = await stripeSubscriptionsCreate({ customer: customer.id, plan: planId });
+    }
+
+    //3. Update local user with stripeCustomerId
+    ctx.db.mutation.updateUser({
+      data: {
+        customerId: customer.id,
+        subscriptionId: subscription.id
+      },
+      where: {
+        id: ctx.request.userId
+      },
+    })
+
+
+    //return our successmessage or failure.
+    if (subscription) {
+      return { message: "Successfully subscribed!" }
+    }
+    else {
+      throw new Error("Something went wrong, sorry.");
+    }
+
   },
   async unsubscribe(parent, args, ctx, info) {
-    //1. 
+    //1. Get User
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId,
+        },
+      },
+    );
+
+    //2. if subscriptionId, unsubscribe at end of term, and delete subscriptionId.
+    if (currentUser.subscriptionId) {
+
+      stripeSubscriptionsUpdate(currentUser.subscriptionId, { cancel_at_period_end: true });
+
+      //3. Update local user with stripeCustomerId
+      ctx.db.mutation.updateUser({
+        data: {
+          customerId: customer.id,
+          subscriptionId: subscription.id
+        },
+        where: {
+          id: ctx.request.userId
+        },
+      })
+    }
+    else {
+      throw new Error("This user isn't subscribed to anything...!")
+    }
 
 
   },
