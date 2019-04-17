@@ -26,6 +26,12 @@ type Query {
   getPlansList: [Plan]!
 }
 
+type Plan {
+  id: ID!
+  planId: String!
+  description: String!
+}
+
 type User {
   id: ID!
   subscriptionId: String!
