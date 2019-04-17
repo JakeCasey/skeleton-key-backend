@@ -24,12 +24,3 @@ type User {
   permissions: [Permission]
   plansSubscribed: [String!]!
 }
-
-type Plan {
-  id: ID! @unique
-  planId: String!
-  interval: String
-  description: String
-  product: String!
-  usersSubscribed: [User]
-}
