@@ -13,23 +13,23 @@ enum Permission {
 
 type User {
   id: ID! @unique
-  customerId: String
+  customerId: String @unique
   subscriptionId: String
+  period_ends: String
   name: String!
   email: String! @unique
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission]
-  plansSubscribed: [Plan]
+  plansSubscribed: [String!]!
 }
 
 type Plan {
-  id: ID! @unique,
-  planId: String!,
-  interval: String,
-  description: String,
-  product: String!,
+  id: ID! @unique
+  planId: String!
+  interval: String
+  description: String
+  product: String!
   usersSubscribed: [User]
 }
-

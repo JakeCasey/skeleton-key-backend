@@ -1,6 +1,7 @@
 // let's go!
 
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config({ path: 'variables.env' });
@@ -11,6 +12,32 @@ const environment = process.env.NODE_ENV || 'development';
 const server = createServer();
 
 server.express.use(cookieParser());
+server.express.use(bodyParser());
+
+server.express.use('/api/stripe/webhooks', async (req, res) => {
+  var period_ends = req.body.data.object.lines.data[0].period.end.toString();
+  var customerId = req.body.data.object.customer;
+  // this handles our stripe webhooks use Ngrok for testing.
+  // listen for the paid event and update user subscribedUntil value
+  try {
+    var result = await db.mutation.updateUser({
+      data: {
+        period_ends,
+      },
+      where: {
+        customerId,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!result) {
+    res.sendStatus(500);
+  } else {
+    res.sendStatus(200);
+  }
+});
 
 //decode JWT so we can get user ID on each req
 server.express.use((req, res, next) => {

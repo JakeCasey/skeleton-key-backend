@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/jakeacasey/skeleton-key-backend/dev
-# timestamp: Thu Apr 04 2019 19:26:53 GMT-0500 (Central Daylight Time)
+# timestamp: Mon Apr 15 2019 19:13:12 GMT-0500 (Central Daylight Time)
 
 type AggregatePlan {
   count: Int!
@@ -21,18 +21,18 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createUser(data: UserCreateInput!): User!
   createPlan(data: PlanCreateInput!): Plan!
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  createUser(data: UserCreateInput!): User!
   updatePlan(data: PlanUpdateInput!, where: PlanWhereUniqueInput!): Plan
-  deleteUser(where: UserWhereUniqueInput!): User
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deletePlan(where: PlanWhereUniqueInput!): Plan
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
   upsertPlan(where: PlanWhereUniqueInput!, create: PlanCreateInput!, update: PlanUpdateInput!): Plan!
-  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyPlans(data: PlanUpdateManyMutationInput!, where: PlanWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   deleteManyPlans(where: PlanWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -96,20 +96,7 @@ input PlanCreateInput {
   interval: String
   description: String
   product: String!
-  usersSubscribed: UserCreateManyWithoutPlansSubscribedInput
-}
-
-input PlanCreateManyWithoutUsersSubscribedInput {
-  create: [PlanCreateWithoutUsersSubscribedInput!]
-  connect: [PlanWhereUniqueInput!]
-}
-
-input PlanCreateWithoutUsersSubscribedInput {
-  id: ID
-  planId: String!
-  interval: String
-  description: String
-  product: String!
+  usersSubscribed: UserCreateManyInput
 }
 
 """An edge in a connection."""
@@ -144,217 +131,6 @@ type PlanPreviousValues {
   interval: String
   description: String
   product: String!
-}
-
-input PlanScalarWhereInput {
-  """Logical AND on all given filters."""
-  AND: [PlanScalarWhereInput!]
-
-  """Logical OR on all given filters."""
-  OR: [PlanScalarWhereInput!]
-
-  """Logical NOT on all given filters combined by AND."""
-  NOT: [PlanScalarWhereInput!]
-  id: ID
-
-  """All values that are not equal to given value."""
-  id_not: ID
-
-  """All values that are contained in given list."""
-  id_in: [ID!]
-
-  """All values that are not contained in given list."""
-  id_not_in: [ID!]
-
-  """All values less than the given value."""
-  id_lt: ID
-
-  """All values less than or equal the given value."""
-  id_lte: ID
-
-  """All values greater than the given value."""
-  id_gt: ID
-
-  """All values greater than or equal the given value."""
-  id_gte: ID
-
-  """All values containing the given string."""
-  id_contains: ID
-
-  """All values not containing the given string."""
-  id_not_contains: ID
-
-  """All values starting with the given string."""
-  id_starts_with: ID
-
-  """All values not starting with the given string."""
-  id_not_starts_with: ID
-
-  """All values ending with the given string."""
-  id_ends_with: ID
-
-  """All values not ending with the given string."""
-  id_not_ends_with: ID
-  planId: String
-
-  """All values that are not equal to given value."""
-  planId_not: String
-
-  """All values that are contained in given list."""
-  planId_in: [String!]
-
-  """All values that are not contained in given list."""
-  planId_not_in: [String!]
-
-  """All values less than the given value."""
-  planId_lt: String
-
-  """All values less than or equal the given value."""
-  planId_lte: String
-
-  """All values greater than the given value."""
-  planId_gt: String
-
-  """All values greater than or equal the given value."""
-  planId_gte: String
-
-  """All values containing the given string."""
-  planId_contains: String
-
-  """All values not containing the given string."""
-  planId_not_contains: String
-
-  """All values starting with the given string."""
-  planId_starts_with: String
-
-  """All values not starting with the given string."""
-  planId_not_starts_with: String
-
-  """All values ending with the given string."""
-  planId_ends_with: String
-
-  """All values not ending with the given string."""
-  planId_not_ends_with: String
-  interval: String
-
-  """All values that are not equal to given value."""
-  interval_not: String
-
-  """All values that are contained in given list."""
-  interval_in: [String!]
-
-  """All values that are not contained in given list."""
-  interval_not_in: [String!]
-
-  """All values less than the given value."""
-  interval_lt: String
-
-  """All values less than or equal the given value."""
-  interval_lte: String
-
-  """All values greater than the given value."""
-  interval_gt: String
-
-  """All values greater than or equal the given value."""
-  interval_gte: String
-
-  """All values containing the given string."""
-  interval_contains: String
-
-  """All values not containing the given string."""
-  interval_not_contains: String
-
-  """All values starting with the given string."""
-  interval_starts_with: String
-
-  """All values not starting with the given string."""
-  interval_not_starts_with: String
-
-  """All values ending with the given string."""
-  interval_ends_with: String
-
-  """All values not ending with the given string."""
-  interval_not_ends_with: String
-  description: String
-
-  """All values that are not equal to given value."""
-  description_not: String
-
-  """All values that are contained in given list."""
-  description_in: [String!]
-
-  """All values that are not contained in given list."""
-  description_not_in: [String!]
-
-  """All values less than the given value."""
-  description_lt: String
-
-  """All values less than or equal the given value."""
-  description_lte: String
-
-  """All values greater than the given value."""
-  description_gt: String
-
-  """All values greater than or equal the given value."""
-  description_gte: String
-
-  """All values containing the given string."""
-  description_contains: String
-
-  """All values not containing the given string."""
-  description_not_contains: String
-
-  """All values starting with the given string."""
-  description_starts_with: String
-
-  """All values not starting with the given string."""
-  description_not_starts_with: String
-
-  """All values ending with the given string."""
-  description_ends_with: String
-
-  """All values not ending with the given string."""
-  description_not_ends_with: String
-  product: String
-
-  """All values that are not equal to given value."""
-  product_not: String
-
-  """All values that are contained in given list."""
-  product_in: [String!]
-
-  """All values that are not contained in given list."""
-  product_not_in: [String!]
-
-  """All values less than the given value."""
-  product_lt: String
-
-  """All values less than or equal the given value."""
-  product_lte: String
-
-  """All values greater than the given value."""
-  product_gt: String
-
-  """All values greater than or equal the given value."""
-  product_gte: String
-
-  """All values containing the given string."""
-  product_contains: String
-
-  """All values not containing the given string."""
-  product_not_contains: String
-
-  """All values starting with the given string."""
-  product_starts_with: String
-
-  """All values not starting with the given string."""
-  product_not_starts_with: String
-
-  """All values ending with the given string."""
-  product_ends_with: String
-
-  """All values not ending with the given string."""
-  product_not_ends_with: String
 }
 
 type PlanSubscriptionPayload {
@@ -401,14 +177,7 @@ input PlanUpdateInput {
   interval: String
   description: String
   product: String
-  usersSubscribed: UserUpdateManyWithoutPlansSubscribedInput
-}
-
-input PlanUpdateManyDataInput {
-  planId: String
-  interval: String
-  description: String
-  product: String
+  usersSubscribed: UserUpdateManyInput
 }
 
 input PlanUpdateManyMutationInput {
@@ -416,41 +185,6 @@ input PlanUpdateManyMutationInput {
   interval: String
   description: String
   product: String
-}
-
-input PlanUpdateManyWithoutUsersSubscribedInput {
-  create: [PlanCreateWithoutUsersSubscribedInput!]
-  connect: [PlanWhereUniqueInput!]
-  set: [PlanWhereUniqueInput!]
-  disconnect: [PlanWhereUniqueInput!]
-  delete: [PlanWhereUniqueInput!]
-  update: [PlanUpdateWithWhereUniqueWithoutUsersSubscribedInput!]
-  updateMany: [PlanUpdateManyWithWhereNestedInput!]
-  deleteMany: [PlanScalarWhereInput!]
-  upsert: [PlanUpsertWithWhereUniqueWithoutUsersSubscribedInput!]
-}
-
-input PlanUpdateManyWithWhereNestedInput {
-  where: PlanScalarWhereInput!
-  data: PlanUpdateManyDataInput!
-}
-
-input PlanUpdateWithoutUsersSubscribedDataInput {
-  planId: String
-  interval: String
-  description: String
-  product: String
-}
-
-input PlanUpdateWithWhereUniqueWithoutUsersSubscribedInput {
-  where: PlanWhereUniqueInput!
-  data: PlanUpdateWithoutUsersSubscribedDataInput!
-}
-
-input PlanUpsertWithWhereUniqueWithoutUsersSubscribedInput {
-  where: PlanWhereUniqueInput!
-  update: PlanUpdateWithoutUsersSubscribedDataInput!
-  create: PlanCreateWithoutUsersSubscribedInput!
 }
 
 input PlanWhereInput {
@@ -672,12 +406,12 @@ input PlanWhereUniqueInput {
 }
 
 type Query {
-  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   plans(where: PlanWhereInput, orderBy: PlanOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Plan]!
-  user(where: UserWhereUniqueInput!): User
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   plan(where: PlanWhereUniqueInput!): Plan
-  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  user(where: UserWhereUniqueInput!): User
   plansConnection(where: PlanWhereInput, orderBy: PlanOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PlanConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -687,21 +421,22 @@ type Query {
 }
 
 type Subscription {
-  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   plan(where: PlanSubscriptionWhereInput): PlanSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type User implements Node {
   id: ID!
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String!
   email: String!
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission!]!
-  plansSubscribed(where: PlanWhereInput, orderBy: PlanOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Plan!]
+  plansSubscribed: [String!]!
 }
 
 """A connection to a list of items."""
@@ -718,17 +453,18 @@ input UserCreateInput {
   id: ID
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String!
   email: String!
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserCreatepermissionsInput
-  plansSubscribed: PlanCreateManyWithoutUsersSubscribedInput
+  plansSubscribed: UserCreateplansSubscribedInput
 }
 
-input UserCreateManyWithoutPlansSubscribedInput {
-  create: [UserCreateWithoutPlansSubscribedInput!]
+input UserCreateManyInput {
+  create: [UserCreateInput!]
   connect: [UserWhereUniqueInput!]
 }
 
@@ -736,16 +472,8 @@ input UserCreatepermissionsInput {
   set: [Permission!]
 }
 
-input UserCreateWithoutPlansSubscribedInput {
-  id: ID
-  customerId: String
-  subscriptionId: String
-  name: String!
-  email: String!
-  password: String!
-  resetToken: String
-  resetTokenExpiry: Float
-  permissions: UserCreatepermissionsInput
+input UserCreateplansSubscribedInput {
+  set: [String!]
 }
 
 """An edge in a connection."""
@@ -764,6 +492,8 @@ enum UserOrderByInput {
   customerId_DESC
   subscriptionId_ASC
   subscriptionId_DESC
+  period_ends_ASC
+  period_ends_DESC
   name_ASC
   name_DESC
   email_ASC
@@ -784,12 +514,14 @@ type UserPreviousValues {
   id: ID!
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String!
   email: String!
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission!]!
+  plansSubscribed: [String!]!
 }
 
 input UserScalarWhereInput {
@@ -921,6 +653,46 @@ input UserScalarWhereInput {
 
   """All values not ending with the given string."""
   subscriptionId_not_ends_with: String
+  period_ends: String
+
+  """All values that are not equal to given value."""
+  period_ends_not: String
+
+  """All values that are contained in given list."""
+  period_ends_in: [String!]
+
+  """All values that are not contained in given list."""
+  period_ends_not_in: [String!]
+
+  """All values less than the given value."""
+  period_ends_lt: String
+
+  """All values less than or equal the given value."""
+  period_ends_lte: String
+
+  """All values greater than the given value."""
+  period_ends_gt: String
+
+  """All values greater than or equal the given value."""
+  period_ends_gte: String
+
+  """All values containing the given string."""
+  period_ends_contains: String
+
+  """All values not containing the given string."""
+  period_ends_not_contains: String
+
+  """All values starting with the given string."""
+  period_ends_starts_with: String
+
+  """All values not starting with the given string."""
+  period_ends_not_starts_with: String
+
+  """All values ending with the given string."""
+  period_ends_ends_with: String
+
+  """All values not ending with the given string."""
+  period_ends_not_ends_with: String
   name: String
 
   """All values that are not equal to given value."""
@@ -1144,50 +916,68 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
-input UserUpdateInput {
+input UserUpdateDataInput {
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String
   email: String
   password: String
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
-  plansSubscribed: PlanUpdateManyWithoutUsersSubscribedInput
+  plansSubscribed: UserUpdateplansSubscribedInput
+}
+
+input UserUpdateInput {
+  customerId: String
+  subscriptionId: String
+  period_ends: String
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: UserUpdatepermissionsInput
+  plansSubscribed: UserUpdateplansSubscribedInput
 }
 
 input UserUpdateManyDataInput {
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String
   email: String
   password: String
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
+  plansSubscribed: UserUpdateplansSubscribedInput
+}
+
+input UserUpdateManyInput {
+  create: [UserCreateInput!]
+  connect: [UserWhereUniqueInput!]
+  set: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  delete: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueNestedInput!]
+  updateMany: [UserUpdateManyWithWhereNestedInput!]
+  deleteMany: [UserScalarWhereInput!]
+  upsert: [UserUpsertWithWhereUniqueNestedInput!]
 }
 
 input UserUpdateManyMutationInput {
   customerId: String
   subscriptionId: String
+  period_ends: String
   name: String
   email: String
   password: String
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
-}
-
-input UserUpdateManyWithoutPlansSubscribedInput {
-  create: [UserCreateWithoutPlansSubscribedInput!]
-  connect: [UserWhereUniqueInput!]
-  set: [UserWhereUniqueInput!]
-  disconnect: [UserWhereUniqueInput!]
-  delete: [UserWhereUniqueInput!]
-  update: [UserUpdateWithWhereUniqueWithoutPlansSubscribedInput!]
-  updateMany: [UserUpdateManyWithWhereNestedInput!]
-  deleteMany: [UserScalarWhereInput!]
-  upsert: [UserUpsertWithWhereUniqueWithoutPlansSubscribedInput!]
+  plansSubscribed: UserUpdateplansSubscribedInput
 }
 
 input UserUpdateManyWithWhereNestedInput {
@@ -1199,26 +989,19 @@ input UserUpdatepermissionsInput {
   set: [Permission!]
 }
 
-input UserUpdateWithoutPlansSubscribedDataInput {
-  customerId: String
-  subscriptionId: String
-  name: String
-  email: String
-  password: String
-  resetToken: String
-  resetTokenExpiry: Float
-  permissions: UserUpdatepermissionsInput
+input UserUpdateplansSubscribedInput {
+  set: [String!]
 }
 
-input UserUpdateWithWhereUniqueWithoutPlansSubscribedInput {
+input UserUpdateWithWhereUniqueNestedInput {
   where: UserWhereUniqueInput!
-  data: UserUpdateWithoutPlansSubscribedDataInput!
+  data: UserUpdateDataInput!
 }
 
-input UserUpsertWithWhereUniqueWithoutPlansSubscribedInput {
+input UserUpsertWithWhereUniqueNestedInput {
   where: UserWhereUniqueInput!
-  update: UserUpdateWithoutPlansSubscribedDataInput!
-  create: UserCreateWithoutPlansSubscribedInput!
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserWhereInput {
@@ -1350,6 +1133,46 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   subscriptionId_not_ends_with: String
+  period_ends: String
+
+  """All values that are not equal to given value."""
+  period_ends_not: String
+
+  """All values that are contained in given list."""
+  period_ends_in: [String!]
+
+  """All values that are not contained in given list."""
+  period_ends_not_in: [String!]
+
+  """All values less than the given value."""
+  period_ends_lt: String
+
+  """All values less than or equal the given value."""
+  period_ends_lte: String
+
+  """All values greater than the given value."""
+  period_ends_gt: String
+
+  """All values greater than or equal the given value."""
+  period_ends_gte: String
+
+  """All values containing the given string."""
+  period_ends_contains: String
+
+  """All values not containing the given string."""
+  period_ends_not_contains: String
+
+  """All values starting with the given string."""
+  period_ends_starts_with: String
+
+  """All values not starting with the given string."""
+  period_ends_not_starts_with: String
+
+  """All values ending with the given string."""
+  period_ends_ends_with: String
+
+  """All values not ending with the given string."""
+  period_ends_not_ends_with: String
   name: String
 
   """All values that are not equal to given value."""
@@ -1532,12 +1355,10 @@ input UserWhereInput {
 
   """All values greater than or equal the given value."""
   resetTokenExpiry_gte: Float
-  plansSubscribed_every: PlanWhereInput
-  plansSubscribed_some: PlanWhereInput
-  plansSubscribed_none: PlanWhereInput
 }
 
 input UserWhereUniqueInput {
   id: ID
+  customerId: String
   email: String
 }
