@@ -15,17 +15,22 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
+  subscribe(tokenId: String!, planId: String!): SuccessMessage
+  unsubscribe(planId: String!): User
 }
 
 type Query {
   usersConnection(where: UserWhereInput): UserConnection
   me: User
   users: [User]!
+  getPlansList: [Plan]!
 }
 
 type User {
   id: ID!
+  subscriptionId: String!
   name: String!
   email: String!
   permissions: [Permission!]!
+  plansSubscribed: [String]!
 }
