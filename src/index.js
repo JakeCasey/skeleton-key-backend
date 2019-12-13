@@ -4,6 +4,12 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 
+const request = require('request-promise');
+const puppeteer = require('puppeteer');
+const devices = require('puppeteer/DeviceDescriptors');
+const cheerio = require('cheerio');
+var parse = require('url-parse');
+
 require('dotenv').config({ path: 'variables.env' });
 const createServer = require('./createServer');
 const db = require('./db');
