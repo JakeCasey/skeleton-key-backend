@@ -76,6 +76,32 @@ TODO: Add examples of changing the datamodel and deploying to prisma.
 
 The purpose of Skeleton Key is simple: To provide the fastest boilerplate for a full-stack web application. I couldn't find any great starting points for the kinds of applications I wanted to build. There's tons out there like [django-cookiecutter](https://github.com/pydanny/cookiecutter-django) that make it crazy easy to spin up apps; just not in the tech I wanted to use.
 
+## Extras
+
+A shell script that can be added to your .zshrc or .bashrc easily spin up new projects, and open their respective frontend and backends. DISCLAIMER: It will overwrite if you supply a pre-existing directory as the project name.
+
+```bash
+function newproject() {
+  if [ -z "$1" ]
+  then
+    echo "No project name supplied."
+    exit 1
+  fi
+
+  mkdir ./"$1"
+  cd "$1"
+  git clone https://github.com/JakeCasey/skeleton-key-backend.git &&
+  git clone https://github.com/JakeCasey/skeleton-key-frontend.git &&
+  git clone https://github.com/JakeCasey/skeleton-key-prisma.git
+  $(openproject)
+}
+
+function openproject() {
+  code ./skeleton-key-frontend
+  code ./skeleton-key-backend
+}
+```
+
 ## Thanks
 
 Inspired by [Wes Bos's Advanced React](https://advancedreact.com) (seriously, go buy this.)
