@@ -5,7 +5,12 @@ type SuccessMessage {
 }
 
 type Mutation {
-  signup(email: String!, password: String!, name: String!): User!
+  signup(
+    email: String!
+    password: String!
+    name: String!
+    allowMailchimp: Boolean!
+  ): User!
   signin(email: String!, password: String!): User!
   signout: SuccessMessage
   requestReset(email: String!): SuccessMessage
@@ -14,9 +19,8 @@ type Mutation {
     password: String!
     confirmPassword: String!
   ): User!
-  updatePermissions(permissions: [Permission], userId: ID!): User
-  subscribe(tokenId: String!, planId: String!): SuccessMessage
-  unsubscribe(planId: String!): User
+  subscribe(paymentMethodId: String!, priceId: String!): SuccessMessage
+  unsubscribe: User
 }
 
 type Query {
@@ -37,6 +41,7 @@ type User {
   subscriptionId: String!
   name: String!
   email: String!
+  period_ends: String
   permissions: [Permission!]!
-  plansSubscribed: [String]!
+  isSubscribed: Boolean
 }

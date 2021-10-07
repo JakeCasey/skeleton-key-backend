@@ -1,6 +1,13 @@
 const { forwardTo } = require('prisma-binding');
-const { hasPermission } = require('../utils');
+const {
+  returnText,
+  hasPermission,
+  isSubscribed,
+  isSubscribedByUserId,
+} = require('../utils');
 const { plans } = require('../plans');
+const needle = require('needle');
+const cheerio = require('cheerio');
 
 const Query = {
   usersConnection: forwardTo('db'),
@@ -29,7 +36,7 @@ const Query = {
   async getPlansList(parent, args, ctx, info) {
     //array of hardcoded plans
     return plans;
-  }
+  },
 };
 
 module.exports = Query;

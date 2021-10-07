@@ -1,5 +1,5 @@
-# source: https://us1.prisma.sh/jakeacasey/diff/dev
-# timestamp: Thu Dec 12 2019 17:43:51 GMT-0600 (Central Standard Time)
+# source: https://us1.prisma.sh/jakeacasey/remapp/dev
+# timestamp: Thu Oct 07 2021 13:57:12 GMT-0500 (Central Daylight Time)
 
 type AggregateUser {
   count: Int!
@@ -85,6 +85,8 @@ type User implements Node {
   updatedAt: DateTime!
   createdAt: DateTime!
   subscriptionId: String
+  isSubscribed: Boolean
+  plan_name: String
   period_ends: String
   name: String!
   email: String!
@@ -92,7 +94,6 @@ type User implements Node {
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission!]!
-  plansSubscribed: [String!]!
 }
 
 """A connection to a list of items."""
@@ -109,6 +110,8 @@ input UserCreateInput {
   id: ID
   customerId: String
   subscriptionId: String
+  isSubscribed: Boolean
+  plan_name: String
   period_ends: String
   name: String!
   email: String!
@@ -116,15 +119,10 @@ input UserCreateInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserCreatepermissionsInput
-  plansSubscribed: UserCreateplansSubscribedInput
 }
 
 input UserCreatepermissionsInput {
   set: [Permission!]
-}
-
-input UserCreateplansSubscribedInput {
-  set: [String!]
 }
 
 """An edge in a connection."""
@@ -147,6 +145,10 @@ enum UserOrderByInput {
   createdAt_DESC
   subscriptionId_ASC
   subscriptionId_DESC
+  isSubscribed_ASC
+  isSubscribed_DESC
+  plan_name_ASC
+  plan_name_DESC
   period_ends_ASC
   period_ends_DESC
   name_ASC
@@ -167,6 +169,8 @@ type UserPreviousValues {
   updatedAt: DateTime!
   createdAt: DateTime!
   subscriptionId: String
+  isSubscribed: Boolean
+  plan_name: String
   period_ends: String
   name: String!
   email: String!
@@ -174,7 +178,6 @@ type UserPreviousValues {
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission!]!
-  plansSubscribed: [String!]!
 }
 
 type UserSubscriptionPayload {
@@ -219,6 +222,8 @@ input UserSubscriptionWhereInput {
 input UserUpdateInput {
   customerId: String
   subscriptionId: String
+  isSubscribed: Boolean
+  plan_name: String
   period_ends: String
   name: String
   email: String
@@ -226,12 +231,13 @@ input UserUpdateInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
-  plansSubscribed: UserUpdateplansSubscribedInput
 }
 
 input UserUpdateManyMutationInput {
   customerId: String
   subscriptionId: String
+  isSubscribed: Boolean
+  plan_name: String
   period_ends: String
   name: String
   email: String
@@ -239,15 +245,10 @@ input UserUpdateManyMutationInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
-  plansSubscribed: UserUpdateplansSubscribedInput
 }
 
 input UserUpdatepermissionsInput {
   set: [Permission!]
-}
-
-input UserUpdateplansSubscribedInput {
-  set: [String!]
 }
 
 input UserWhereInput {
@@ -423,6 +424,50 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   subscriptionId_not_ends_with: String
+  isSubscribed: Boolean
+
+  """All values that are not equal to given value."""
+  isSubscribed_not: Boolean
+  plan_name: String
+
+  """All values that are not equal to given value."""
+  plan_name_not: String
+
+  """All values that are contained in given list."""
+  plan_name_in: [String!]
+
+  """All values that are not contained in given list."""
+  plan_name_not_in: [String!]
+
+  """All values less than the given value."""
+  plan_name_lt: String
+
+  """All values less than or equal the given value."""
+  plan_name_lte: String
+
+  """All values greater than the given value."""
+  plan_name_gt: String
+
+  """All values greater than or equal the given value."""
+  plan_name_gte: String
+
+  """All values containing the given string."""
+  plan_name_contains: String
+
+  """All values not containing the given string."""
+  plan_name_not_contains: String
+
+  """All values starting with the given string."""
+  plan_name_starts_with: String
+
+  """All values not starting with the given string."""
+  plan_name_not_starts_with: String
+
+  """All values ending with the given string."""
+  plan_name_ends_with: String
+
+  """All values not ending with the given string."""
+  plan_name_not_ends_with: String
   period_ends: String
 
   """All values that are not equal to given value."""

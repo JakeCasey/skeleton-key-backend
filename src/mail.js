@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const mjml2html = require('mjml');
 
 //mjml responsive email templating framework
 
@@ -11,17 +12,30 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const makeANiceEmail = text => `
-    <div className="email" style="border: 1px solid black;
-    padding: 20px;
-    font-family: sans-serif;
-    line-height: 2;
-    font-size: 20px";>
-    <h2> Hello There! </h2>
-    <p>${text}</p>
-    <p> 😘 , Jake </p>
-    </div>
-`;
+const makeAPasswordResetEmail = text => {
+  return mailTemplate(text);
+};
+
+const mailTemplate = text => {
+  return mjml2html(
+    `<mjml>
+  <mj-body background-color="#F4F4F4" color="#55575d" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'" >
+    <mj-section background-color="#ffffff" background-repeat="repeat" padding-bottom="0px" padding-top="30px" padding="20px 0" text-align="center" vertical-align="top">
+      <mj-column>
+        <mj-image align="center" padding="10px 25px" src="https://diffup.com/images/logo.png" target="_blank" width="214px"></mj-image>
+        <mj-text align="left" color="#55575d" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'" font-size="13px" line-height="22px" padding-bottom="15px" padding-top="0px" padding="10px 25px">
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#ffffff" background-repeat="repeat" background-size="auto" padding-top="30px" padding="20px 0px 50px 0px" text-align="center" vertical-align="top">
+      <mj-column>
+      ${text}
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>`,
+  );
+};
 
 exports.transport = transport;
-exports.makeANiceEmail = makeANiceEmail;
+exports.makeAPasswordResetEmail = makeAPasswordResetEmail;

@@ -11,18 +11,21 @@ enum Permission {
   PERMISSIONUPDATE
 }
 
+
 type User {
-  id: ID! @id
+  id: ID! @id 
   customerId: String @unique
   updatedAt: DateTime! @updatedAt
   createdAt: DateTime! @createdAt
   subscriptionId: String
-  period_ends: String
+  isSubscribed: Boolean @default(value: false)
+  plan_name: String
+  period_ends: String @default(value: "0")
   name: String!
   email: String! @unique
   password: String!
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission!] @scalarList(strategy: RELATION)
-  plansSubscribed: [String!] @scalarList(strategy: RELATION)
 }
+

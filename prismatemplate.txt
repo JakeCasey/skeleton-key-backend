@@ -8,3 +8,16 @@ datamodel: datamodel.prisma
 hooks:
   post-deploy:
     - graphql get-schema -p prisma
+
+##
+#This line sets our endpoint to be our LOCAL/DEV Prisma endpoint.
+# endpoint: ${env:DEV_PRISMA_ENDPOINT}
+endpoint: ${env:PRISMA_ENDPOINT}
+#This is where we set our REMOTE Prisma endpoint.
+# endpoint:
+datamodel: datamodel.prisma
+secret: ${env:PRISMA_SECRET}
+#we add this to get our post deploy
+hooks:
+  post-deploy:
+    - graphql get-schema -p prisma

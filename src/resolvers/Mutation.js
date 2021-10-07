@@ -1,24 +1,30 @@
 let bcrypt = require('bcryptjs');
+
 const jwt = require('jsonwebtoken');
+
 const { randomBytes } = require('crypto');
 const { promisify } = require('util');
 const oneYear = 1000 * 60 * 60 * 24 * 365; // 1 year
-const { transport, makeANiceEmail } = require('../mail');
-const { hasPermission } = require('../utils');
+const { transport, makeAPasswordResetEmail } = require('../mail');
+const { getPlanInfoByPriceIdOrName } = require('../utils');
+
+const { addUserToMailchimp } = require('../utils/mailchimp');
+const { sendMessageToTelegram } = require('../utils/telegram');
+
 const stripe = require('../stripe');
 
-var subscription = {
-  create: stripe.subscriptions.create.bind(stripe.subscriptions),
-  update: stripe.subscriptions.update.bind(stripe.subscriptions),
-};
-var customer = { create: stripe.customers.create.bind(stripe.customers) };
-
-const stripeSubscriptionsCreate = promisify(subscription.create);
-const stripeSubscriptionsUpdate = promisify(subscription.update);
-const stripeCustomersCreate = promisify(customer.create);
+const environment = process.env.NODE_ENV || 'development';
+const origin =
+  environment == 'development'
+    ? process.env.DEV_FRONTEND_URL
+    : process.env.FRONTEND_URL;
 
 const Mutations = {
   async signup(parent, args, ctx, info) {
+    if (!args.email || !args.password || !args.name) {
+      throw new Error('Please fill in all the fields!');
+    }
+
     //lowercase email
     args.email = args.email.toLowerCase();
     //hash their password
@@ -27,7 +33,8 @@ const Mutations = {
     const user = await ctx.db.mutation.createUser(
       {
         data: {
-          ...args,
+          name: args.name,
+          email: args.email,
           password,
           permissions: { set: ['USER'] },
         },
@@ -41,6 +48,14 @@ const Mutations = {
       httpOnly: true,
       maxAge: oneYear,
     });
+    // Handle Mailchimp.
+
+    if (environment != 'development') {
+      addUserToMailchimp(args.email, args.name, args.allowMailchimp);
+    }
+
+    sendMessageToTelegram(`✨ ${args.email} has signed up. ✨`);
+
     //return user to browser
     return user;
   },
@@ -75,6 +90,8 @@ const Mutations = {
     return 'You have successfully logged out!';
   },
   async requestReset(parent, args, ctx, info) {
+    console.log('hit');
+
     //1. Check if this is a real user
     const user = await ctx.db.query.user({ where: { email: args.email } });
     if (!user) {
@@ -88,16 +105,19 @@ const Mutations = {
       where: { email: args.email },
       data: { resetToken, resetTokenExpiry },
     });
+
+    let html = makeAPasswordResetEmail(
+      `<mj-text>Your Password Reset Token is here! \n\n <a href="${origin}/reset?resetToken=${resetToken}"> Click Here to Reset</a></mj-text>`,
+    ).html;
+
+    console.log(html);
+
     //3 Email them that reset token
     const mailRes = await transport.sendMail({
-      from: 'jakeacasey@gmail.com',
+      from: process.env.MAIL_FROM_ADDRESS,
       to: user.email,
       subject: 'Your Password Reset Token',
-      html: makeANiceEmail(
-        `Your Password Reset Token is here! \n\n <a href="${
-          process.env.FRONTEND_URL
-        }/reset?resetToken=${resetToken}"> Click Here to Reset</a>`,
-      ),
+      html,
     });
 
     //4. return the message
@@ -143,85 +163,85 @@ const Mutations = {
     return updatedUser;
     //9. Have a beer
   },
-  async updatePermissions(parent, args, ctx, info) {
-    //1. check if they are logged in
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in!');
-    }
-    //2. query current user
+  async subscribe(parent, { paymentMethodId, priceId }, ctx, info) {
+    //1. Find or Create Customer
+    //1a. Check if there is already a customer ID in the User model
     const currentUser = await ctx.db.query.user(
       {
         where: {
           id: ctx.request.userId,
         },
       },
-      info,
+      `{ id email customerId }`,
     );
-    //3. check if they have permissions to do this
-    hasPermission(currentUser, ['ADMIN', 'PERMISSIONUPDATE']);
-    //4. update permissions.
-    return ctx.db.mutation.updateUser(
-      {
-        data: {
-          permissions: {
-            set: args.permissions,
-          },
-        },
-        where: {
-          id: args.userId,
-        },
-      },
-      info,
-    );
-  },
-  async subscribe(parent, { tokenId, planId }, ctx, info) {
-    //1. Find or Create Customer
-    //1a. Check if there is already a customer ID in the User model
-    const currentUser = await ctx.db.query.user({
-      where: {
-        id: ctx.request.userId,
-      },
-    });
+
+    let subscription;
     //1b. if a customerId exists, subscribe it to our planId
     if (currentUser.customerId) {
-      var subscription = await stripeSubscriptionsCreate({
+      await stripe.paymentMethods.attach(paymentMethodId, {
         customer: currentUser.customerId,
-        plan: planId,
       });
-    } else {
-      //1c. else create a customer
-      var customer = await stripeCustomersCreate({
-        email: currentUser.email,
-        source: tokenId,
+
+      await stripe.customers.update(currentUser.customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
       });
 
       //2. Subscribe Customer to planId with customerId
-      var subscription = await stripeSubscriptionsCreate({
+      subscription = await stripe.subscriptions.create({
+        customer: currentUser.customerId,
+        items: [
+          {
+            price: priceId,
+          },
+        ],
+      });
+    } else {
+      const customer = await stripe.customers.create({
+        email: currentUser.email,
+      });
+
+      currentUser.customerId = customer.id;
+      //1c. else create a customer
+      await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: currentUser.customerId,
+      });
+
+      await stripe.customers.update(currentUser.customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      //2. Subscribe Customer to planId with customerId
+      subscription = await stripe.subscriptions.create({
         customer: customer.id,
-        plan: planId,
+        items: [
+          {
+            price: priceId,
+          },
+        ],
       });
     }
 
-    //3. Update local user with stripeCustomerId
-    if (!currentUser.plansSubscribed) {
-      plansSubscribed = [planId];
-    } else {
-      plansSubscribed = [...currentUser.plansSubscribed, planId];
-    }
+    // 3. Get our plan name so we can refer back to it later.
+    let { plan_name } = getPlanInfoByPriceIdOrName(priceId);
 
     ctx.db.mutation.updateUser({
       data: {
         customerId: currentUser.customerId || customer.id,
         subscriptionId: subscription.id,
-        plansSubscribed: {
-          set: plansSubscribed,
-        },
+        period_ends: subscription.current_period_end,
+        plan_name,
+        isSubscribed: true,
       },
       where: {
         id: ctx.request.userId,
       },
     });
 
+    sendMessageToTelegram(`🎉 ${currentUser.email} has subscribed! 🎉`);
     //return our successmessage or failure.
     if (subscription) {
       return { message: 'Successfully subscribed!' };
@@ -230,7 +250,6 @@ const Mutations = {
     }
   },
   async unsubscribe(parent, args, ctx, info) {
-    console.log('unsub?');
     //1. Get User
     const currentUser = await ctx.db.query.user(
       {
@@ -238,35 +257,24 @@ const Mutations = {
           id: ctx.request.userId,
         },
       },
-      '{subscriptionId, plansSubscribed}',
+      '{subscriptionId}',
     );
 
     //2. if subscriptionId, unsubscribe at end of term, and delete subscriptionId.
     if (currentUser.subscriptionId) {
-      stripeSubscriptionsUpdate(currentUser.subscriptionId, {
+      await stripe.subscriptions.update(currentUser.subscriptionId, {
         cancel_at_period_end: true,
       });
+
       //remove subscription ID and Plan from respective arrays
-
       subscriptionId = '';
-
-      console.log(currentUser.plansSubscribed);
-
-      //filter out plan unsubbed from
-      plansSubscribed = currentUser.plansSubscribed.filter(a => {
-        return a != args.planId;
-      });
-
-      console.log(plansSubscribed);
 
       //3. Update local user with stripeCustomerId
       const updatedUser = await ctx.db.mutation.updateUser(
         {
           data: {
             subscriptionId,
-            plansSubscribed: {
-              set: plansSubscribed,
-            },
+            isSubscribed: false,
           },
           where: {
             id: ctx.request.userId,

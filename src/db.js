@@ -1,5 +1,7 @@
 //this file conencts to remote prisma db and gives u ability to query it with js
+require('dotenv').config({ path: '../variables.env' });
 const { Prisma } = require('prisma-binding');
+const path = require('path');
 const environment = process.env.NODE_ENV || 'development';
 var endpoint =
   environment === 'development'
@@ -9,7 +11,7 @@ var endpoint =
 console.log(endpoint);
 
 const db = new Prisma({
-  typeDefs: 'src/generated/prisma.graphql',
+  typeDefs: path.join(__dirname + '/generated/prisma.graphql'),
   endpoint: endpoint,
   secret: process.env.PRISMA_SECRET,
   debug: false,
