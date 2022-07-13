@@ -41,13 +41,13 @@ server.express.post(
       event = stripe.webhooks.constructEvent(
         req.body,
         req.headers['stripe-signature'],
-        process.env.STRIPE_WEBHOOK_SECRET,
+        process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
       console.log(err);
       console.log(`⚠️  Webhook signature verification failed.`);
       console.log(
-        `⚠️  Check the env file and enter the correct webhook secret.`,
+        `⚠️  Check the env file and enter the correct webhook secret.`
       );
       return res.sendStatus(400);
     }
@@ -99,7 +99,7 @@ server.express.post(
       // Unexpected event type
     }
     res.sendStatus(200);
-  },
+  }
 );
 
 server.express.use(bodyParser({ limit: '1mb' }));
@@ -123,11 +123,85 @@ server.express.use(bodyParser(), async (req, res, next) => {
   }
   const user = await db.query.user(
     { where: { id: req.userId } },
-    '{id, permissions, email, name}',
+    '{id, permissions, email, name}'
   );
   req.user = user;
   next();
 });
+
+erver.express.post('/create-customer-portal-session', async (req, res) => {
+  // Authenticate your user.
+  let customer = req.user.customerId;
+
+  if (!customer) {
+    return res.redirect(`${origin}/settings`);
+  }
+
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer,
+      return_url: `${origin}/settings`,
+    });
+    res.redirect(session.url);
+  } catch (e) {
+    console.log(e);
+    return res.send(500);
+  }
+});
+
+server.express.post(
+  '/create-checkout-session',
+  bodyParser.urlencoded({ extended: true }),
+  async (req, res) => {
+    // The price ID passed from the client
+    const { priceId } = req.body;
+
+    if (!req.user) {
+      throw new Error("You're not signed in!");
+    }
+
+    let session;
+
+    try {
+      let createOptions = {
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        automatic_tax: {
+          enabled: true,
+        },
+        line_items: [
+          {
+            price: priceId,
+            // For metered billing, do not pass quantity
+            quantity: 1,
+          },
+        ],
+        // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
+        // the actual Session ID is returned in the query parameter when your customer
+        // is redirected to the success page.
+        allow_promotion_codes: true,
+        success_url: `${origin}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}`,
+      };
+      // Create a new customer or use the old customerId
+      if (!req.user.customerId) {
+        createOptions.customer_email = req.user.email;
+      } else {
+        createOptions.customer = req.user.customerId;
+      }
+
+      session = await stripe.checkout.sessions.create(createOptions);
+    } catch (e) {
+      console.log(e);
+    }
+    // Redirect to the URL returned on the Checkout Session.
+    // With express, you can redirect with:
+    if (session) {
+      return res.redirect(303, session.url);
+    }
+    return res.send(400);
+  }
+);
 
 var origin =
   environment == 'development'
@@ -142,11 +216,11 @@ server.start(
       origin: origin,
     },
   },
-  deets => {
+  (deets) => {
     console.log(`Server is now running on port http://localhost:${deets.port}`);
-  },
+  }
 );
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
   process.exit();
 });
