@@ -1,12 +1,9 @@
 // let's go!
 
-require('dotenv').config({ path: 'variables.env' });
+require('dotenv').config({ path: '.env' });
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
-
-const basicAuth = require('express-basic-auth');
 
 const createServer = require('./createServer');
 const db = require('./db');
@@ -129,7 +126,7 @@ server.express.use(bodyParser(), async (req, res, next) => {
   next();
 });
 
-erver.express.post('/create-customer-portal-session', async (req, res) => {
+server.express.post('/create-customer-portal-session', async (req, res) => {
   // Authenticate your user.
   let customer = req.user.customerId;
 
@@ -210,7 +207,7 @@ var origin =
 
 server.start(
   {
-    playground: false,
+    playground: true,
     cors: {
       credentials: true,
       origin: origin,

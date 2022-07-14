@@ -1,16 +1,8 @@
-require('dotenv').config({ path: __dirname + '../variables.env' });
-const needle = require('needle');
 const db = require('./db');
-const puppeteer = require('puppeteer-extra');
-// add stealth plugin and use defaults (all evasion techniques)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-
-const fs = require('fs');
 
 function hasPermission(user, permissionsNeeded) {
-  const matchedPermissions = user.permissions.filter(permissionTheyHave =>
-    permissionsNeeded.includes(permissionTheyHave),
+  const matchedPermissions = user.permissions.filter((permissionTheyHave) =>
+    permissionsNeeded.includes(permissionTheyHave)
   );
   if (!matchedPermissions.length) {
     throw new Error(`You do not have sufficient permissions

@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../variables.env' });
+require('dotenv').config({ path: '../.env' });
 const { Telegraf } = require('telegraf');
 
 let myTelegramId = '517861570';
@@ -13,7 +13,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 // bot.launch();
 // bot.on('text', ctx => ctx.replyWithHTML('<b>Hello</b>'));
 
-let sendMessageToTelegram = msg => {
+let sendMessageToTelegram = (msg) => {
   bot.telegram.sendMessage(myTelegramId, msg);
 };
 

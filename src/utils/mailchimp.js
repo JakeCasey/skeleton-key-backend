@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../variables.env' });
+require('dotenv').config({ path: '../.env' });
 const mailchimp = require('@mailchimp/mailchimp_marketing');
 const { sendMessageToTelegram } = require('./telegram');
 
@@ -16,7 +16,7 @@ let addUserToMailchimp = async (email, firstName, allowMailchimp) => {
     tags.push('marketing');
 
     sendMessageToTelegram(
-      `🙊 ${email} has agreed to receive marketing emails! 🙊`,
+      `🙊 ${email} has agreed to receive marketing emails! 🙊`
     );
   }
 
