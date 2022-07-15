@@ -1,4 +1,7 @@
-# import * from './generated/prisma.graphql'
+enum Permission {
+  ADMIN
+  USER
+}
 
 type SuccessMessage {
   message: String
@@ -24,7 +27,6 @@ type Mutation {
 }
 
 type Query {
-  usersConnection(where: UserWhereInput): UserConnection
   me: User
   users: [User]!
   getPlansList: [Plan]!

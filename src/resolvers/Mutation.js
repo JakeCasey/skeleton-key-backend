@@ -39,7 +39,7 @@ const Mutations = {
           permissions: { set: ['USER'] },
         },
       },
-      info,
+      info
     );
     //create JWT toekn for them
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
@@ -90,8 +90,6 @@ const Mutations = {
     return 'You have successfully logged out!';
   },
   async requestReset(parent, args, ctx, info) {
-    console.log('hit');
-
     //1. Check if this is a real user
     const user = await ctx.db.query.user({ where: { email: args.email } });
     if (!user) {
@@ -107,7 +105,7 @@ const Mutations = {
     });
 
     let html = makeAPasswordResetEmail(
-      `<mj-text>Your Password Reset Token is here! \n\n <a href="${origin}/reset?resetToken=${resetToken}"> Click Here to Reset</a></mj-text>`,
+      `<mj-text>Your Password Reset Token is here! \n\n <a href="${origin}/reset?resetToken=${resetToken}"> Click Here to Reset</a></mj-text>`
     ).html;
 
     console.log(html);
@@ -172,7 +170,7 @@ const Mutations = {
           id: ctx.request.userId,
         },
       },
-      `{ id email customerId }`,
+      `{ id email customerId }`
     );
 
     let subscription;
@@ -257,7 +255,7 @@ const Mutations = {
           id: ctx.request.userId,
         },
       },
-      '{subscriptionId}',
+      '{subscriptionId}'
     );
 
     //2. if subscriptionId, unsubscribe at end of term, and delete subscriptionId.
@@ -280,7 +278,7 @@ const Mutations = {
             id: ctx.request.userId,
           },
         },
-        info,
+        info
       );
       return updatedUser;
     } else {

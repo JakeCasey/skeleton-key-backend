@@ -10,7 +10,6 @@ const needle = require('needle');
 const cheerio = require('cheerio');
 
 const Query = {
-  usersConnection: forwardTo('db'),
   me(parent, args, ctx, info) {
     //check if there is a current user
     if (!ctx.request.userId) {
@@ -20,7 +19,7 @@ const Query = {
       {
         where: { id: ctx.request.userId },
       },
-      info,
+      info
     );
   },
   async users(parent, args, ctx, info) {
