@@ -1,5 +1,5 @@
-const nodemailer = require('nodemailer');
-const mjml2html = require('mjml');
+import nodemailer from 'nodemailer';
+import mjml2html from 'mjml';
 
 //mjml responsive email templating framework
 
@@ -12,11 +12,11 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const makeAPasswordResetEmail = text => {
+const makeAPasswordResetEmail = (text) => {
   return mailTemplate(text);
 };
 
-const mailTemplate = text => {
+const mailTemplate = (text) => {
   return mjml2html(
     `<mjml>
   <mj-body background-color="#F4F4F4" color="#55575d" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'" >
@@ -33,9 +33,8 @@ const mailTemplate = text => {
       </mj-column>
     </mj-section>
   </mj-body>
-</mjml>`,
+</mjml>`
   );
 };
 
-exports.transport = transport;
-exports.makeAPasswordResetEmail = makeAPasswordResetEmail;
+export { transport, makeAPasswordResetEmail };

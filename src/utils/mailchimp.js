@@ -1,6 +1,8 @@
-require('dotenv').config({ path: '../.env' });
-const mailchimp = require('@mailchimp/mailchimp_marketing');
-const { sendMessageToTelegram } = require('./telegram');
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+
+import mailchimp from '@mailchimp/mailchimp_marketing';
+import sendMessageToTelegram from './telegram.js';
 
 let audienceId = '0cc6d370c1';
 
@@ -31,4 +33,4 @@ let addUserToMailchimp = async (email, firstName, allowMailchimp) => {
   });
 };
 
-exports.addUserToMailchimp = addUserToMailchimp;
+export default addUserToMailchimp;

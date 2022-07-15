@@ -1,5 +1,7 @@
-require('dotenv').config({ path: '../.env' });
-const { Telegraf } = require('telegraf');
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+
+import { Telegraf } from 'telegraf';
 
 let myTelegramId = '517861570';
 
@@ -17,4 +19,4 @@ let sendMessageToTelegram = (msg) => {
   bot.telegram.sendMessage(myTelegramId, msg);
 };
 
-exports.sendMessageToTelegram = sendMessageToTelegram;
+export default sendMessageToTelegram;

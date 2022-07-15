@@ -13,4 +13,4 @@ const plans = [
   },
 ];
 
-exports.plans = plans;
+export { plans };

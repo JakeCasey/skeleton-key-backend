@@ -1,13 +1,5 @@
-const { forwardTo } = require('prisma-binding');
-const {
-  returnText,
-  hasPermission,
-  isSubscribed,
-  isSubscribedByUserId,
-} = require('../utils');
-const { plans } = require('../plans');
-const needle = require('needle');
-const cheerio = require('cheerio');
+import { hasPermission } from '../utils.js';
+import { plans } from '../plans.js';
 
 const Query = {
   me(parent, args, ctx, info) {
@@ -24,6 +16,7 @@ const Query = {
   },
   async users(parent, args, ctx, info) {
     //1. Check if log in;
+
     if (!ctx.request.userId) {
       throw new Error('You must be logged in!');
     }
@@ -38,4 +31,4 @@ const Query = {
   },
 };
 
-module.exports = Query;
+export default Query;

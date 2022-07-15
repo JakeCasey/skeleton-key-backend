@@ -1,1 +1,5 @@
-module.exports = require('stripe')(process.env.STRIPE_SECRET);
+import stripeInstance from 'stripe';
+
+let stripe = stripeInstance(process.env.STRIPE_SECRET_KEY);
+
+export default stripe;

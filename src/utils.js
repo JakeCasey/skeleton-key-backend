@@ -1,4 +1,4 @@
-const db = require('./db');
+import { prisma } from './db.js';
 
 function hasPermission(user, permissionsNeeded) {
   const matchedPermissions = user.permissions.filter((permissionTheyHave) =>
@@ -80,7 +80,9 @@ let getPlanInfoByPriceIdOrName = (id, plan_name = '') => {
   throw new Error('Price ID not recognized.');
 };
 
-exports.getPlanInfoByPriceIdOrName = getPlanInfoByPriceIdOrName;
-exports.hasPermission = hasPermission;
-exports.isSubscribedByUserId = isSubscribedByUserId;
-exports.isAdmin = isAdmin;
+export {
+  hasPermission,
+  isAdmin,
+  isSubscribedByUserId,
+  getPlanInfoByPriceIdOrName,
+};

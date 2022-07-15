@@ -1,19 +1,28 @@
 // let's go!
 
-require('dotenv').config({ path: '.env' });
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env' });
 
-const createServer = require('./createServer');
-const db = require('./db');
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+
+import express from 'express';
+import createServer from './createServer.js';
+import http from 'http';
+
+import { prisma } from './db.js';
 
 const environment = process.env.NODE_ENV || 'development';
-const stripe = require('./stripe');
+
+import stripe from './stripe.js';
 
 const server = createServer();
 
-// server.express.use(
+const app = express();
+const httpServer = http.createServer(app);
+
+// app.use(
 //   '/api/v1/',
 //   cors(),
 //   bodyParser.json(),
@@ -23,11 +32,11 @@ const server = createServer();
 //   API,
 // );
 
-server.express.use(cookieParser());
+app.use(cookieParser());
 
 // Our Cron Job for Monitors.
 // */5 * * * *
-server.express.post(
+app.post(
   '/stripe-webhook',
   bodyParser.raw({ type: 'application/json' }),
   async (req, res) => {
@@ -99,9 +108,9 @@ server.express.post(
   }
 );
 
-server.express.use(bodyParser({ limit: '1mb' }));
+app.use(bodyParser({ limit: '1mb' }));
 //decode JWT so we can get user ID on each req
-server.express.use(bodyParser(), (req, res, next) => {
+app.use(bodyParser(), (req, res, next) => {
   const { token } = req.cookies;
   if (token) {
     const { userId } = jwt.verify(token, process.env.APP_SECRET);
@@ -113,7 +122,7 @@ server.express.use(bodyParser(), (req, res, next) => {
 });
 
 //2. Create a middleware that populates the user on each request
-server.express.use(bodyParser(), async (req, res, next) => {
+app.use(bodyParser(), async (req, res, next) => {
   //if they aren't logged in skip this
   if (!req.userId) {
     return next();
@@ -126,7 +135,7 @@ server.express.use(bodyParser(), async (req, res, next) => {
   next();
 });
 
-server.express.post('/create-customer-portal-session', async (req, res) => {
+app.post('/create-customer-portal-session', async (req, res) => {
   // Authenticate your user.
   let customer = req.user.customerId;
 
@@ -146,7 +155,7 @@ server.express.post('/create-customer-portal-session', async (req, res) => {
   }
 });
 
-server.express.post(
+app.post(
   '/create-checkout-session',
   bodyParser.urlencoded({ extended: true }),
   async (req, res) => {
@@ -205,18 +214,15 @@ var origin =
     ? process.env.DEV_FRONTEND_URL
     : process.env.FRONTEND_URL;
 
-server.start(
-  {
-    playground: true,
-    cors: {
-      credentials: true,
-      origin: origin,
-    },
-  },
-  (deets) => {
-    console.log(`Server is now running on port http://localhost:${deets.port}`);
-  }
-);
+await server.start();
+
+server.applyMiddleware({ app });
+
+await httpServer.listen({ port: process.env.PORT || 4444 }, () => {
+  console.log(
+    `Server is now running on port http://localhost:${process.env.PORT || 4444}`
+  );
+});
 
 process.on('SIGINT', function () {
   process.exit();

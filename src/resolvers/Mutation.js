@@ -1,17 +1,18 @@
-let bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const { randomBytes } = require('crypto');
-const { promisify } = require('util');
+import { randomBytes } from 'crypto';
+import { promisify } from 'util';
 const oneYear = 1000 * 60 * 60 * 24 * 365; // 1 year
-const { transport, makeAPasswordResetEmail } = require('../mail');
-const { getPlanInfoByPriceIdOrName } = require('../utils');
 
-const { addUserToMailchimp } = require('../utils/mailchimp');
-const { sendMessageToTelegram } = require('../utils/telegram');
+import { transport, makeAPasswordResetEmail } from '../mail.js';
+import { getPlanInfoByPriceIdOrName } from '../utils.js';
 
-const stripe = require('../stripe');
+import addUserToMailchimp from '../utils/mailchimp.js';
+import sendMessageToTelegram from '../utils/telegram.js';
+
+import stripe from '../stripe.js';
 
 const environment = process.env.NODE_ENV || 'development';
 const origin =
@@ -19,7 +20,7 @@ const origin =
     ? process.env.DEV_FRONTEND_URL
     : process.env.FRONTEND_URL;
 
-const Mutations = {
+const Mutation = {
   async signup(parent, args, ctx, info) {
     if (!args.email || !args.password || !args.name) {
       throw new Error('Please fill in all the fields!');
@@ -287,4 +288,4 @@ const Mutations = {
   },
 };
 
-module.exports = Mutations;
+export default Mutation;
