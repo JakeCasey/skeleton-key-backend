@@ -41,6 +41,7 @@ type Plan {
 type User {
   id: ID!
   subscriptionId: String!
+  customerId: String
   name: String!
   email: String!
   period_ends: String

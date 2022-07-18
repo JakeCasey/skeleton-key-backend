@@ -22,20 +22,8 @@ const server = createServer();
 const app = express();
 const httpServer = http.createServer(app);
 
-// app.use(
-//   '/api/v1/',
-//   cors(),
-//   bodyParser.json(),
-//   validateAPIKey,
-//   validateUrl,
-//   validateTarget,
-//   API,
-// );
-
 app.use(cookieParser());
 
-// Our Cron Job for Monitors.
-// */5 * * * *
 app.post(
   '/stripe-webhook',
   bodyParser.raw({ type: 'application/json' }),
@@ -121,20 +109,6 @@ app.use(bodyParser(), (req, res, next) => {
   next();
 });
 
-//2. Create a middleware that populates the user on each request
-app.use(bodyParser(), async (req, res, next) => {
-  //if they aren't logged in skip this
-  if (!req.userId) {
-    return next();
-  }
-  const user = await db.query.user(
-    { where: { id: req.userId } },
-    '{id, permissions, email, name}'
-  );
-  req.user = user;
-  next();
-});
-
 app.post('/create-customer-portal-session', async (req, res) => {
   // Authenticate your user.
   let customer = req.user.customerId;
@@ -214,9 +188,14 @@ var origin =
     ? process.env.DEV_FRONTEND_URL
     : process.env.FRONTEND_URL;
 
+let cors = {
+  origin: [origin, 'https://studio.apollographql.com'],
+  credentials: true,
+};
+
 await server.start();
 
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, cors });
 
 await httpServer.listen({ port: process.env.PORT || 4444 }, () => {
   console.log(

@@ -4,6 +4,7 @@ import { plans } from '../plans.js';
 const Query = {
   me(parent, args, ctx, info) {
     //check if there is a current user
+    console.log('hit');
     if (!ctx.req.userId) {
       return null;
     }
@@ -14,11 +15,11 @@ const Query = {
   async users(parent, args, ctx, info) {
     //1. Check if log in;
 
-    if (!ctx.req.userId) {
-      throw new Error('You must be logged in!');
-    }
-    //1. Check if user has permissions to query all users.
-    hasPermission(ctx.req.user, ['ADMIN', 'PERMISSIONUPDATE']);
+    // if (!ctx.req.userId) {
+    //   throw new Error('You must be logged in!');
+    // }
+    // //1. Check if user has permissions to query all users.
+    // hasPermission(ctx.req.user, ['ADMIN', 'PERMISSIONUPDATE']);
     //2. If they do, query all the users.
     return ctx.prisma.user.findMany({ where: {} });
   },

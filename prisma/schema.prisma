@@ -17,17 +17,17 @@ enum Permission {
 
 model User {
   id Int @id @default(autoincrement())
-  customerId String @unique
+  customerId String? @unique
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
-  subscriptionId String
+  subscriptionId String?
   isSubscribed Boolean @default(value: false)
-  plan_name String
-  period_ends String @default(value: "0")
-  name String
+  plan_name String?
+  period_ends String? @default(value: "0")
+  name String?
   email String @unique
   password String
-  resetToken String
-  resetTokenExpiry Float
+  resetToken String?
+  resetTokenExpiry Float?
   permissions Permission[]
 }

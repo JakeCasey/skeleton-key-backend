@@ -16,6 +16,7 @@ function createServer() {
     typeDefs,
     csrfPrevention: true,
     cache: 'bounded',
+    uploads: false,
     resolvers: {
       Mutation,
       Query,
@@ -30,10 +31,9 @@ function createServer() {
       }
 
       if (req.userId) {
-        const user = await db.query.user(
-          { where: { id: req.userId } },
-          '{id, permissions, email, name}'
-        );
+        const user = await prisma.user.findUnique({
+          where: { id: req.userId },
+        });
         req.user = user;
       }
 
