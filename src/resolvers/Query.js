@@ -4,7 +4,6 @@ import { plans } from '../plans.js';
 const Query = {
   me(parent, args, ctx, info) {
     //check if there is a current user
-    console.log('hit');
     if (!ctx.req.userId) {
       return null;
     }
@@ -26,6 +25,13 @@ const Query = {
   async getPlansList(parent, args, ctx, info) {
     //array of hardcoded plans
     return plans;
+  },
+  async myClients(parent, args, ctx, info) {
+    // 1. Get clients that belong to me
+    const clients = await ctx.prisma.client.findMany({
+      where: { userId: ctx.req.userId },
+    });
+    return clients;
   },
 };
 

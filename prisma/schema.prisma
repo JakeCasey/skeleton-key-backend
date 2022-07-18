@@ -29,5 +29,17 @@ model User {
   password String
   resetToken String?
   resetTokenExpiry Float?
+  clients Client[]
   permissions Permission[]
+}
+
+model Client {
+ id Int @id @default(autoincrement())
+ userId Int @unique
+ user User @relation(fields: [userId], references: [id])
+ name String
+ destinationEmail String
+ updatedAt DateTime @updatedAt
+ createdAt DateTime @default(now())
+ template String @default("")
 }

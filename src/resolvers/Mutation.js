@@ -78,6 +78,7 @@ const Mutation = {
       maxAge: oneYear, // 1 year cookie
     });
     //5. return the user
+    console.log('logged user in.');
     return user;
   },
   async signout(parent, args, ctx, info) {
@@ -281,6 +282,21 @@ const Mutation = {
     } else {
       throw new Error("This user isn't subscribed to anything...!");
     }
+  },
+  async createClient(_parent, args, ctx, _info) {
+    if (!req.user.id) {
+      throw new Error('You must be logged in!');
+    }
+
+    // 1. get arguments.
+    let { name, destinationEmail } = args;
+
+    // 2. create a new client
+    const client = await ctx.prisma.client.create({
+      data: { name, destinationEmail, user: { connect: { id: req.user.id } } },
+    });
+
+    return client;
   },
 };
 
