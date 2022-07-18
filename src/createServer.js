@@ -20,10 +20,9 @@ function createServer() {
       Mutation,
       Query,
     },
-    context: async ({ req }) => {
+    context: async ({ req, res }) => {
       //decode JWT so we can get user ID on each req
       const { token } = req.cookies;
-      console.log(token);
       if (token) {
         const { userId } = jwt.verify(token, process.env.APP_SECRET);
         // put the userID on the req for future reqs.
@@ -38,7 +37,7 @@ function createServer() {
         req.user = user;
       }
 
-      return { req, prisma };
+      return { req, prisma, res };
     },
   });
 }

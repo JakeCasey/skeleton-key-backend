@@ -31,41 +31,40 @@ const Mutation = {
     //hash their password
     const password = await bcrypt.hash(args.password, 10);
     //create user in the database
-    const user = await ctx.db.mutation.createUser(
-      {
-        data: {
-          name: args.name,
-          email: args.email,
-          password,
-          permissions: { set: ['USER'] },
-        },
+    const user = await ctx.prisma.user.create({
+      data: {
+        name: args.name,
+        email: args.email,
+        password,
+        permissions: { set: ['USER'] },
       },
-      info
-    );
+    });
     //create JWT toekn for them
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     //we set JWT as cookie on response
-    ctx.response.cookie('token', token, {
+    ctx.res.cookie('token', token, {
       httpOnly: true,
       maxAge: oneYear,
     });
     // Handle Mailchimp.
 
     if (environment != 'development') {
-      addUserToMailchimp(args.email, args.name, args.allowMailchimp);
+      // addUserToMailchimp(args.email, args.name, args.allowMailchimp);
     }
 
-    sendMessageToTelegram(`✨ ${args.email} has signed up. ✨`);
+    // sendMessageToTelegram(`✨ ${args.email} has signed up. ✨`);
 
     //return user to browser
     return user;
   },
   async signin(parent, { email, password }, ctx, info) {
     //1. check if there is a user with that email
-    const user = await ctx.db.query.user({ where: { email: email } });
+    const user = await ctx.prisma.user.findUnique({ where: { email: email } });
+
     if (!user) {
       throw new Error(`No such user found ${email}`);
     }
+
     //2. check if their password is correct
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
@@ -74,7 +73,7 @@ const Mutation = {
     //3. generate the jwt token
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     //4. set the cookie with the token
-    ctx.response.cookie('token', token, {
+    ctx.res.cookie('token', token, {
       httpOnly: true,
       maxAge: oneYear, // 1 year cookie
     });
@@ -82,17 +81,19 @@ const Mutation = {
     return user;
   },
   async signout(parent, args, ctx, info) {
-    const isSignedIn = await ctx.request.cookies.token;
+    const isSignedIn = await ctx.req.cookies.token;
     if (!isSignedIn) {
       throw new Error(`You're not logged in!`);
     } else {
-      ctx.response.clearCookie('token');
+      ctx.res.clearCookie('token');
     }
     return 'You have successfully logged out!';
   },
   async requestReset(parent, args, ctx, info) {
     //1. Check if this is a real user
-    const user = await ctx.db.query.user({ where: { email: args.email } });
+    const user = await ctx.prisma.user.findUnique({
+      where: { email: args.email },
+    });
     if (!user) {
       throw new Error(`No such user sfound for email ${args.email}`);
     }
@@ -100,7 +101,7 @@ const Mutation = {
     const randomBytesPromisified = promisify(randomBytes);
     const resetToken = (await randomBytesPromisified(20)).toString('hex');
     const resetTokenExpiry = Date.now() + 3600000; //1 hr from now
-    const res = await ctx.db.mutation.updateUser({
+    const res = await ctx.prisma.user.update({
       where: { email: args.email },
       data: { resetToken, resetTokenExpiry },
     });
@@ -109,7 +110,7 @@ const Mutation = {
       `<mj-text>Your Password Reset Token is here! \n\n <a href="${origin}/reset?resetToken=${resetToken}"> Click Here to Reset</a></mj-text>`
     ).html;
 
-    console.log(html);
+    // console.log(html);
 
     //3 Email them that reset token
     const mailRes = await transport.sendMail({
@@ -130,19 +131,20 @@ const Mutation = {
 
     //2. Check if it's a legit reset
     //3. check if it's expired
-    const [user] = await ctx.db.query.users({
+    const [user] = await ctx.prisma.user.findFirst({
       where: {
         resetToken: args.resetToken,
-        resetTokenExpiry_gte: Date.now() - 3600000,
+        resetTokenExpiry: { gte: Date.now() - 3600000 },
       },
     });
+
     if (!user) {
       throw new Error('This token is either invalid or expired.');
     }
     //4. hash their new password
     const password = await bcrypt.hash(args.password, 10);
     //5. save new password to user and remove old reset token fields
-    const updatedUser = await ctx.db.mutation.updateUser({
+    const updatedUser = await ctx.prisma.user.update({
       where: { email: user.email },
       data: {
         password,
@@ -153,7 +155,7 @@ const Mutation = {
     //6. Generate JWT
     const token = jwt.sign({ userId: updatedUser.id }, process.env.APP_SECRET);
     //7. Set JWT Cookie
-    ctx.response.cookie('token', token, {
+    ctx.res.cookie('token', token, {
       httpOnly: true,
       maxAge: oneYear,
     });
@@ -165,10 +167,10 @@ const Mutation = {
   async subscribe(parent, { paymentMethodId, priceId }, ctx, info) {
     //1. Find or Create Customer
     //1a. Check if there is already a customer ID in the User model
-    const currentUser = await ctx.db.query.user(
+    const currentUser = await ctx.prisma.user.findUnique(
       {
         where: {
-          id: ctx.request.userId,
+          id: ctx.req.userId,
         },
       },
       `{ id email customerId }`
@@ -227,7 +229,7 @@ const Mutation = {
     // 3. Get our plan name so we can refer back to it later.
     let { plan_name } = getPlanInfoByPriceIdOrName(priceId);
 
-    ctx.db.mutation.updateUser({
+    ctx.prisma.user.update({
       data: {
         customerId: currentUser.customerId || customer.id,
         subscriptionId: subscription.id,
@@ -236,11 +238,11 @@ const Mutation = {
         isSubscribed: true,
       },
       where: {
-        id: ctx.request.userId,
+        id: ctx.req.userId,
       },
     });
 
-    sendMessageToTelegram(`🎉 ${currentUser.email} has subscribed! 🎉`);
+    // sendMessageToTelegram(`🎉 ${currentUser.email} has subscribed! 🎉`);
     //return our successmessage or failure.
     if (subscription) {
       return { message: 'Successfully subscribed!' };
@@ -250,14 +252,11 @@ const Mutation = {
   },
   async unsubscribe(parent, args, ctx, info) {
     //1. Get User
-    const currentUser = await ctx.db.query.user(
-      {
-        where: {
-          id: ctx.request.userId,
-        },
+    const currentUser = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.req.userId,
       },
-      '{subscriptionId}'
-    );
+    });
 
     //2. if subscriptionId, unsubscribe at end of term, and delete subscriptionId.
     if (currentUser.subscriptionId) {
@@ -269,18 +268,15 @@ const Mutation = {
       subscriptionId = '';
 
       //3. Update local user with stripeCustomerId
-      const updatedUser = await ctx.db.mutation.updateUser(
-        {
-          data: {
-            subscriptionId,
-            isSubscribed: false,
-          },
-          where: {
-            id: ctx.request.userId,
-          },
+      const updatedUser = await ctx.prisma.user.update({
+        data: {
+          subscriptionId,
+          isSubscribed: false,
         },
-        info
-      );
+        where: {
+          id: ctx.req.userId,
+        },
+      });
       return updatedUser;
     } else {
       throw new Error("This user isn't subscribed to anything...!");
