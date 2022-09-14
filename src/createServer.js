@@ -17,6 +17,7 @@ function createServer() {
     csrfPrevention: true,
     cache: 'bounded',
     uploads: false,
+    debug: true,
     resolvers: {
       Mutation,
       Query,

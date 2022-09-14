@@ -26,13 +26,6 @@ const Query = {
     //array of hardcoded plans
     return plans;
   },
-  async myClients(parent, args, ctx, info) {
-    // 1. Get clients that belong to me
-    const clients = await ctx.prisma.client.findMany({
-      where: { userId: ctx.req.userId },
-    });
-    return clients;
-  },
 };
 
 export default Query;

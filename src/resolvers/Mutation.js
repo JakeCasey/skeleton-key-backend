@@ -26,6 +26,8 @@ const Mutation = {
       throw new Error('Please fill in all the fields!');
     }
 
+    console.log('hit!');
+
     //lowercase email
     args.email = args.email.toLowerCase();
     //hash their password
@@ -36,7 +38,6 @@ const Mutation = {
         name: args.name,
         email: args.email,
         password,
-        permissions: { set: ['USER'] },
       },
     });
     //create JWT toekn for them
@@ -282,21 +283,6 @@ const Mutation = {
     } else {
       throw new Error("This user isn't subscribed to anything...!");
     }
-  },
-  async createClient(_parent, args, ctx, _info) {
-    if (!req.user.id) {
-      throw new Error('You must be logged in!');
-    }
-
-    // 1. get arguments.
-    let { name, destinationEmail } = args;
-
-    // 2. create a new client
-    const client = await ctx.prisma.client.create({
-      data: { name, destinationEmail, user: { connect: { id: req.user.id } } },
-    });
-
-    return client;
   },
 };
 

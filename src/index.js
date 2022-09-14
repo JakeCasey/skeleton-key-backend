@@ -193,6 +193,8 @@ let cors = {
   credentials: true,
 };
 
+console.log(cors);
+
 await server.start();
 
 server.applyMiddleware({ app, cors });

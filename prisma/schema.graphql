@@ -19,14 +19,12 @@ type Mutation {
   ): User!
   subscribe(paymentMethodId: String!, priceId: String!): SuccessMessage
   unsubscribe: User
-  createClient(name: String!, destinationEmail: String!): Client!
 }
 
 type Query {
   me: User
   users: [User]!
   getPlansList: [Plan]!
-  myClients: [Client]!
 }
 
 type Plan {
@@ -42,15 +40,5 @@ type User {
   name: String!
   email: String!
   period_ends: String
-  permissions: [Permission!]!
   isSubscribed: Boolean
-}
-
-type Client {
-  id: ID!
-  userId: ID!
-  name: String!
-  destinationEmail: String!
-  template: String!
-  user: User!
 }
