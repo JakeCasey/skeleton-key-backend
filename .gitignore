@@ -26,3 +26,4 @@ Thumbs.db
 # NPM packages folder.
 node_modules/
 *.env
+db

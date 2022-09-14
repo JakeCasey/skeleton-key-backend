@@ -6,14 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Permission {
-  ADMIN
-  USER
-}
 
 model User {
   id Int @id @default(autoincrement())
@@ -29,17 +25,5 @@ model User {
   password String
   resetToken String?
   resetTokenExpiry Float?
-  clients Client[]
-  permissions Permission[]
 }
 
-model Client {
- id Int @id @default(autoincrement())
- userId Int @unique
- user User @relation(fields: [userId], references: [id])
- name String
- destinationEmail String
- updatedAt DateTime @updatedAt
- createdAt DateTime @default(now())
- template String @default("")
-}
