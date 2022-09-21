@@ -2,7 +2,7 @@ FRONTEND_URL="thisisoururlafterwedeploytoourremoteserver"
 DEV_FRONTEND_URL="http://localhost:7777"
 APP_SECRET="jwtsecret123"
 STRIPE_SECRET="thisiswhereyouputyourstripesecretkey"
-DATABASE_URL=""
+DATABASE_URL="file:./dev.db"
 PORT=4444
 
 
