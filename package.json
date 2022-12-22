@@ -28,7 +28,7 @@
     "express-basic-auth": "^1.2.0",
     "figlet": "^1.2.1",
     "graphql": "^16.5.0",
-    "jsonwebtoken": "8.3.0",
+    "jsonwebtoken": "9.0.0",
     "mjml": "^4.8.1",
     "nodemailer": "^4.6.8",
     "nodemon": "1.19.2",
